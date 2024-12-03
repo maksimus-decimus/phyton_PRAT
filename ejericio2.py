@@ -4,28 +4,65 @@ class Projecte:
         self.nom = nom
         self.duracio = duracio
         self.llenguatge = llenguatge
+        self.tasques = []
+        self.equips = []
 
     def mostrar_informacio(self):
-        print(f"Projecte: {self.nom}, Durada: {self.duracio} mesos de temps, Llenguatge: {self.llenguatge}")
+        return  (f"PROJECTE: {self.nom}, DURADA: {self.duracio} mesos de temps, LLENGUATGE: {self.llenguatge}")
+
+
+    def afegir_tasca(self, tasca):
+        self.tasques.append(tasca)
+
+    def mostrar_tasques(self):
+        tasques_informacio = " "
+        for tasca in self.tasques:
+            tasques_informacio += f" -> TASCA: {tasca.titol} ESTAT: {tasca.estat} RESPONSABLE: {tasca.membre.nom}\n"
+        return tasques_informacio
+
 
 class ProjecteIntern(Projecte):
     def __init__(self, nom, duracio,llenguatge,responsable,departament):
         super().__init__(nom, duracio,llenguatge)
-
         self.responsable = responsable
         self.departament = departament
+
+    def mostrar_informacio(self):
+        info = super().mostrar_informacio()
+        info += f", Responsable: {self.responsable}, Departament: {self.departament}"
+        return info
+
+
 
 class ProjecteExtern(Projecte):
     def __init__(self, nom, duracio, llenguatge,client,pressupost):
         super().__init__(nom, duracio, llenguatge)
-
         self.client = client
         self. pressupost = pressupost
+
+    def mostrar_informacio(self):
+        info = super().mostrar_informacio()
+        info += f", Client: {self.client}, Pressupost: {self.pressupost}K€"
+        return info
 
 
 class Equip:
     def __init__(self,nomEquip):
         self.nomEquip = nomEquip
+        self.membres = []
+
+    def afegir_membre(self, membre):
+        self.membres.append(membre)
+
+    def mostrar_membres(self):
+        info_membres = (f" ")
+        for membre in self.membres:
+            info_membres += f" -> Nom del MEMBRE: {membre.nom} ROL: {membre.rol}, {membre.experiencia} anys d'experiència\n"
+        return info_membres
+
+    def mostrar_informacio(self):
+        return (f"{self.nomEquip}, Membres: 2")
+
 
 class Membre:
     def __init__(self, nom,rol,experiencia):
@@ -34,10 +71,13 @@ class Membre:
         self.experiencia = experiencia
 
 class Tasca:
-    def __init__(self,titol,estat):
+    def __init__(self,titol,estat,membre):
 
         self.titol = titol
         self.estat = estat
+        self.membre = membre
+
+
 
 
 if __name__ == "__main__":
@@ -87,3 +127,5 @@ if __name__ == "__main__":
     # Mostrar informació del projecte extern
     print("\nInformació del projecte extern:")
     print(projecte_extern.mostrar_informacio())
+
+
