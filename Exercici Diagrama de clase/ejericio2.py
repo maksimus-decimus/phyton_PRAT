@@ -61,7 +61,7 @@ class Equip:
         return info_membres
 
     def mostrar_informacio(self):
-        return (f"{self.nomEquip}, Membres: 2")
+        return (f"{self.nomEquip}, Membres: {len(self.membres)}") #"len" funciona per llegir el length de una variable, com hi han 2 membres definits, surt que [0] i [1] son 2 valors
 
 
 class Membre:
@@ -69,6 +69,9 @@ class Membre:
         self.nom = nom
         self.rol = rol
         self.experiencia = experiencia
+
+    def mostrar_membre(self):
+        return self.nom
 
 class Tasca:
     def __init__(self,titol,estat,membre):
