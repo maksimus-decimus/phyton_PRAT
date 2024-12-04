@@ -1,29 +1,29 @@
 class Projecte:
-    def __init__(self, nom, duracio,llenguatge):
+    def __init__(self, nom, duracio,llenguatge): #inicialitza la clase 1 pare
 
         self.nom = nom
         self.duracio = duracio
         self.llenguatge = llenguatge
-        self.tasques = []
-        self.equips = []
+        self.tasques = [] #inicialitzar tasques amb un valor indefinit
+        self.equips = [] #inicialitzar equips amb valor indefinit
 
     def mostrar_informacio(self):
         return  (f"PROJECTE: {self.nom}, DURADA: {self.duracio} mesos de temps, LLENGUATGE: {self.llenguatge}")
-
+    #def que retorni la informació (perque si poso print surt NONE per alguna raó)
 
     def afegir_tasca(self, tasca):
-        self.tasques.append(tasca)
+        self.tasques.append(tasca) #que apunti les tasques assignades
 
     def mostrar_tasques(self):
         tasques_informacio = " "
         for tasca in self.tasques:
             tasques_informacio += f" -> TASCA: {tasca.titol} ESTAT: {tasca.estat} RESPONSABLE: {tasca.membre.nom}\n"
-        return tasques_informacio
+        return tasques_informacio #procés per a que imprimeixi la informació després d'haber recorregut tot
 
 
-class ProjecteIntern(Projecte):
+class ProjecteIntern(Projecte): #classe 2
     def __init__(self, nom, duracio,llenguatge,responsable,departament):
-        super().__init__(nom, duracio,llenguatge)
+        super().__init__(nom, duracio,llenguatge) #per a que heredi els valors del pare
         self.responsable = responsable
         self.departament = departament
 
@@ -31,49 +31,50 @@ class ProjecteIntern(Projecte):
         info = super().mostrar_informacio()
         info += f", Responsable: {self.responsable}, Departament: {self.departament}"
         return info
+        #mateix procés que el return anterior, que vagi sumant (Afegint info) fins a que retorni tot
 
 
-
-class ProjecteExtern(Projecte):
+class ProjecteExtern(Projecte): #classe 3
     def __init__(self, nom, duracio, llenguatge,client,pressupost):
-        super().__init__(nom, duracio, llenguatge)
+        super().__init__(nom, duracio, llenguatge) #herencia
         self.client = client
         self. pressupost = pressupost
 
     def mostrar_informacio(self):
-        info = super().mostrar_informacio()
+        info = super().mostrar_informacio() #herencia d'altre classe
         info += f", Client: {self.client}, Pressupost: {self.pressupost}K€"
         return info
 
 
-class Equip:
+class Equip: #classe 4
     def __init__(self,nomEquip):
         self.nomEquip = nomEquip
-        self.membres = []
+        self.membres = [] #membres sense determinar per a que puguin ser afegits
 
     def afegir_membre(self, membre):
-        self.membres.append(membre)
+        self.membres.append(membre) #afegir membres determinats a la linia
 
     def mostrar_membres(self):
         info_membres = (f" ")
         for membre in self.membres:
             info_membres += f" -> Nom del MEMBRE: {membre.nom} ROL: {membre.rol}, {membre.experiencia} anys d'experiència\n"
         return info_membres
-
+        #després de afegir totes les dates, retornar tot a la consola
     def mostrar_informacio(self):
-        return (f"{self.nomEquip}, Membres: {len(self.membres)}") #"len" funciona per llegir el length de una variable, com hi han 2 membres definits, surt que [0] i [1] son 2 valors
+        return (f"{self.nomEquip}, Membres: {len(self.membres)}")
+        #"len" funciona per llegir el length de una variable, com hi han 2 membres definits, surt que [0] i [1] son 2 valors
 
 
-class Membre:
+class Membre: #classe 5
     def __init__(self, nom,rol,experiencia):
         self.nom = nom
         self.rol = rol
         self.experiencia = experiencia
 
     def mostrar_membre(self):
-        return self.nom
+        return self.nom #imprimir nom NOMÉS en aquesta classe
 
-class Tasca:
+class Tasca: #classe 6
     def __init__(self,titol,estat,membre):
 
         self.titol = titol
