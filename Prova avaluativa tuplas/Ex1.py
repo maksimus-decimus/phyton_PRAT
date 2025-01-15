@@ -14,8 +14,7 @@ def calcular_total(comandes,client): ## 1.
         return total
 
 
-print (calcular_total(comandes, "Marta"))
-print ()
+
 
 def clients_comanda_minim(comandes, minim_import): ## 2.
     clients = []
@@ -27,8 +26,7 @@ def clients_comanda_minim(comandes, minim_import): ## 2.
     return clients
 
 
-print(clients_comanda_minim(comandes,100))
-print()
+
 
 def imprimir_comandas_totes(comandes,client):## 3.
     if client in comandes:
@@ -37,5 +35,48 @@ def imprimir_comandas_totes(comandes,client):## 3.
             print(f"Ha comprat - {producte}: {quantitat} unitats a {preu} €")
 
 
-imprimir_comandas_totes(comandes,"Anna")
 
+
+
+
+print()
+print("Benvingut al programa de la botiga:")
+print()
+print("1. Veure cost total de cada client")
+print("2. Veure clients que han gastat més de 100 €")
+print("3. Veure de comandes d'un client")
+print("4. Sortir del programa")
+print()
+print("Escriu la teva selecció: ")
+seleccio = input()
+
+while True:
+    if seleccio == '1':
+        print("Escriu el nom del client: ")
+        clientINTRO= input()
+        clientintroduit = True
+        while clientintroduit:
+            if clientINTRO == "Marta" or clientINTRO == "Anna" or clientINTRO == "Joan":
+                print(calcular_total(comandes, clientINTRO))
+                break
+                
+            else:
+                print("No existeix!")
+
+                clientINTRO=input()
+
+
+    if seleccio == '2':
+        print(clients_comanda_minim(comandes,100))
+        break
+    if seleccio == '3':
+        print("De quin client vols veure les comandes?")
+        clientINTRO=input()
+        print(imprimir_comandas_totes(comandes,clientINTRO))
+        break
+    if seleccio =='4':
+        print("Sortint del programa...")
+        break
+    else:
+        print("Opció no vàlida!")
+        seleccio=input()
