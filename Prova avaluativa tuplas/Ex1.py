@@ -1,6 +1,8 @@
 ##BOTIGA
 
 #BASE DONADA PEL DOCUMENT (nom_producte, quantitat, preu_unitari).
+
+
 comandes = {
     "Anna": [("Llibre", 2, 10.0), ("Bolígraf", 5, 1.5)],
     "Joan": [("Carpeta", 3, 4.5)],
@@ -38,45 +40,53 @@ def imprimir_comandas_totes(comandes,client):## 3.
 
 
 
-
-print()
-print("Benvingut al programa de la botiga:")
-print()
-print("1. Veure cost total de cada client")
-print("2. Veure clients que han gastat més de 100 €")
-print("3. Veure de comandes d'un client")
-print("4. Sortir del programa")
-print()
-print("Escriu la teva selecció: ")
-seleccio = input()
-
 while True:
+    print('\033[H\033[J')
+    print()
+    print("Benvingut al programa de la botiga:")
+    print()
+    print("1. Veure cost total de cada client")
+    print("2. Veure clients que han gastat més de 100 €")
+    print("3. Veure de comandes d'un client")
+    print("4. Sortir del programa")
+    print()
+    print("Escriu la teva selecció: ")
+    seleccio = input()
+
     if seleccio == '1':
-        print("Escriu el nom del client: ")
-        clientINTRO= input()
-        clientintroduit = True
-        while clientintroduit:
+        while True:
+            print("Escriu el nom del client: ")
+            clientINTRO= input()
+
+
             if clientINTRO == "Marta" or clientINTRO == "Anna" or clientINTRO == "Joan":
                 print(calcular_total(comandes, clientINTRO))
+                input("Prem enter per continuar...")
                 break
-                
+
+
             else:
                 print("No existeix!")
+                continue
 
-                clientINTRO=input()
-
-
-    if seleccio == '2':
+    elif seleccio == '2':
         print(clients_comanda_minim(comandes,100))
-        break
-    if seleccio == '3':
+        input("Prem enter per continuar...")
+
+
+
+    elif seleccio == '3':
         print("De quin client vols veure les comandes?")
         clientINTRO=input()
         print(imprimir_comandas_totes(comandes,clientINTRO))
-        break
-    if seleccio =='4':
+        input("Prem enter per continuar...")
+
+
+    elif seleccio =='4':
         print("Sortint del programa...")
         break
+
+
     else:
-        print("Opció no vàlida!")
+        print("Opció no vàlida! Escriu una vàlida: ")
         seleccio=input()
