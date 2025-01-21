@@ -60,4 +60,4 @@ print(pila.longitud())  # Sortida: 2
 print(pila.buit())  # Sortida: False
 pila.extreure()
 pila.extreure()
-print(pila.buit()) #Sortida: True 
+print(pila.buit()) #Sortida: True
