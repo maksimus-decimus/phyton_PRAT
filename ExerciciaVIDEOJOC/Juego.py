@@ -22,6 +22,10 @@ pygame.display.set_caption("Joc Extensible - Ampliació 4: Menú i Reinici")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 24)
 
+# Cargar la imagen de fondo
+background = pygame.image.load("cielo.png").convert()
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # Ajustar al tamaño de la pantalla
+
 # Sonidos y canciones
 
 
@@ -34,6 +38,8 @@ lives = 3
 last_difficulty_update_time = pygame.time.get_ticks()
 spawn_interval = 1500
 ADD_OBSTACLE = pygame.USEREVENT + 1
+ADD_CLOUD = pygame.USEREVENT + 2
+pygame.time.set_timer(ADD_CLOUD, 2000)  # Generar una nube cada 2 segundos
 
 # ========================
 # Funcions Auxiliars
@@ -105,13 +111,45 @@ class Obstacle(pygame.sprite.Sprite):
             score += 1
             self.kill()
 
+class Cloud(pygame.sprite.Sprite):
+    """Clase para las nubes que se mueven en el fondo."""
+    def __init__(self):
+        super().__init__()
+        # Cargar la imagen de la nube
+        self.image = pygame.image.load("nube.png").convert_alpha()
+        # Escalar la imagen de manera aleatoria
+        scale_factor = random.uniform(0.5, 1.5)  # Escala entre 50% y 150%
+        self.image = pygame.transform.scale(
+            self.image,
+            (int(self.image.get_width() * scale_factor), int(self.image.get_height() * scale_factor))
+        )
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(WIDTH, WIDTH + 200)  # Aparece fuera de la pantalla (derecha)
+        self.rect.y = random.randint(0, HEIGHT // 2)  # Posición vertical aleatoria
+        self.speed = random.randint(1, 3)  # Velocidad aleatoria
+
+    def update(self):
+        """Mueve la nube de derecha a izquierda."""
+        self.rect.x -= self.speed  # Mover hacia la izquierda
+        if self.rect.right < 0:  # Si la nube sale de la pantalla por la izquierda, se elimina
+            self.kill()
+
+    def update(self):
+        """Actualitza la posició de l'obstacle movent-lo cap a l'esquerra.
+           Quan surt completament de la pantalla, s'incrementa la puntuació i s'elimina."""
+        global score
+        self.rect.x -= self.speed
+        if self.rect.right < 0:
+            score += 1
+            self.kill()
+
 # ========================
 # Funció per reinicialitzar el Joc
 # ========================
 
 def new_game():
     """Reinicialitza totes les variables i grups per començar una nova partida."""
-    global score, difficulty_level, lives, last_difficulty_update_time, spawn_interval, all_sprites, obstacles, player
+    global score, difficulty_level, lives, last_difficulty_update_time, spawn_interval, all_sprites, obstacles, player, clouds
     score = 0
     difficulty_level = 1
     lives = 3
@@ -120,6 +158,7 @@ def new_game():
     pygame.time.set_timer(ADD_OBSTACLE, spawn_interval)
     all_sprites = pygame.sprite.Group()
     obstacles = pygame.sprite.Group()
+    clouds = pygame.sprite.Group()
     player = Player()
     all_sprites.add(player)
 
@@ -153,16 +192,24 @@ def game_loop():
     new_game()
     game_state = "playing"
     running = True
+    
     while running and game_state == "playing":
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             elif event.type == ADD_OBSTACLE:
                 obstacle = Obstacle()
                 all_sprites.add(obstacle)
                 obstacles.add(obstacle)
+                print("Obstaculo generado")
+
+            elif event.type == ADD_CLOUD:  # Generar nubes
+                cloud = Cloud()
+                all_sprites.add(cloud)
+                clouds.add(cloud)
         # Incrementar la dificultat cada 15 segons
         current_time = pygame.time.get_ticks()
         if current_time - last_difficulty_update_time >= 15000:
@@ -183,7 +230,7 @@ def game_loop():
             else:
                 game_state = "game_over"
         # Dibuixar la escena
-        screen.fill(WHITE)
+        screen.blit(background, (0, 0))  # Dibujar el fondo
         all_sprites.draw(screen)
         score_text = font.render("Puntuació: " + str(score), True, BLACK)
         difficulty_text = font.render("Dificultat: " + str(difficulty_level), True, BLACK)
