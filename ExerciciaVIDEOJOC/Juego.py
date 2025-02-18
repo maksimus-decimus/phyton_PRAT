@@ -5,8 +5,6 @@ import sys
 # ========================
 # Configuració inicial
 # ========================
-WIDTH = 800
-HEIGHT = 600
 FPS = 60
 
 # Colors (RGB)
@@ -17,6 +15,8 @@ BLUE  = (0, 0, 255)
 
 # Inicialitzar Pygame i la finestra
 pygame.init()
+display_info = pygame.display.Info()
+WIDTH, HEIGHT = display_info.current_w, display_info.current_h
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Joc Extensible - Ampliació 4: Menú i Reinici")
 clock = pygame.time.Clock()
@@ -31,19 +31,25 @@ menu_background = pygame.transform.scale(menu_background, (WIDTH, HEIGHT))  # Aj
 background = pygame.image.load("cielo.png").convert()
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))  # Ajustar al tamaño de la pantalla
 
-# Cargar sprites
-# Cargar imágenes del jugador con escalado
+game_over_background = pygame.image.load("game_over_background.png").convert()
+game_over_background = pygame.transform.scale(game_over_background, (WIDTH, HEIGHT))
+
+
+
+# Cargar sprites-----
+
+# JUGADOR
 player_image = pygame.image.load("avion_jugador.png").convert_alpha()
 player_image = pygame.transform.scale(player_image, (100, 100))
 
-
+#ENEMIGOS
 enemy_images = [
     pygame.image.load("enemigo1.png").convert_alpha(),
     pygame.image.load("enemigo2.png").convert_alpha(),
     pygame.image.load("enemigo3.png").convert_alpha()
 ]
 
-# Cargar imágenes de explosión (debes tener estas imágenes en tu proyecto)
+# EXPLOSIONES
 explosion_images = [
     pygame.image.load("ExEnemigo_1.png").convert_alpha(),
     pygame.image.load("ExEnemigo_2.png").convert_alpha(),
@@ -205,7 +211,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.x = WIDTH + random.randint(10, 100)
         self.rect.y = random.randint(0, HEIGHT - self.rect.height)
         # La velocitat s'incrementa amb la dificultat
-        self.speed = random.randint(3 + difficulty_level, 7 + difficulty_level)
+        self.speed = random.randint(5 + difficulty_level, 9 + difficulty_level)
         self.direction = 1  # Dirección de movimiento para el enemigo 2 (1: abajo, -1: arriba)
         self.last_shot_time = pygame.time.get_ticks()  # Tiempo del último disparo
 
@@ -551,7 +557,7 @@ def game_loop():
                 cloud = Cloud()
                 clouds.add(cloud)  # Añadir la nube solo al grupo clouds
             elif event.type == pygame.KEYDOWN:  # Detectar cuando se presiona una tecla
-                if event.key == pygame.K_l:  # Si se presiona la tecla L
+                if event.key == pygame.K_z:  # Si se presiona la tecla Z
                     projectile = Projectile(player.rect.right, player.rect.centery)
                     projectiles.add(projectile)
                     all_sprites.add(projectile)
@@ -621,8 +627,10 @@ def game_loop():
                     for obstacle in obstacles:
                         obstacle.motor_sound.stop()  # Detener el sonido del motor de cada enemigo
                     player.motor_sound.stop()  # Detener el sonido del motor del jugador
-                    game_state = "game_over"
+                    game_state = "game_over"  # Cambiar el estado del juego a "game_over"
                     pygame.mixer.music.stop()  # Detener la música del juego al perder
+                    print("Cambiando a game over")
+                    show_game_over(score)
 
             # Comprobar colisiones entre el jugador y los obstáculos
             if pygame.sprite.spritecollideany(player, obstacles) and not player.invincible:
@@ -638,8 +646,10 @@ def game_loop():
                     for obstacle in obstacles:
                         obstacle.motor_sound.stop()  # Detener el sonido del motor de cada enemigo
                     player.motor_sound.stop()  # Detener el sonido del motor del jugador
-                    game_state = "game_over"
+                    game_state = "game_over"  # Cambiar el estado del juego a "game_over"
                     pygame.mixer.music.stop()  # Detener la música del juego al perder
+                    print("Cambiando a game over")
+                    show_game_over(score)
 
         # Dibujar la escena (siempre se dibuja, incluso en pausa)
         screen.blit(background, (0, 0))  # Dibujar el fondo
@@ -655,14 +665,15 @@ def game_loop():
         screen.blit(lives_text, (10, 70))
 
         pygame.display.flip()
-    return score
+    return score  # Devuelve el puntaje final al salir del bucle
 
 # ========================
 # Funció per mostrar la pantalla de Game Over
 # ========================
 
-def show_game_over(final_score):
+def show_game_over(score):
     """Mostra la pantalla de Game Over amb la puntuació final i espera per reiniciar."""
+
     waiting = True
     while waiting:
         clock.tick(FPS)
@@ -672,9 +683,10 @@ def show_game_over(final_score):
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 waiting = False
-        screen.fill(WHITE)
+        screen.blit(game_over_background, (0, 0))
+
         draw_text(screen, "Game Over!", font, RED, 350, 200)
-        draw_text(screen, "Puntuació Final: " + str(final_score), font, BLACK, 320, 250)
+        draw_text(screen, "Puntuació Final: " + str(score), font, BLACK, 320, 250)
         draw_text(screen, "Prem qualsevol tecla per reiniciar", font, BLACK, 250, 300)
         pygame.display.flip()
 
@@ -688,5 +700,5 @@ while True:
     pygame.mixer.music.play(-1)
     show_menu()                   # Mostrar menú d'inici
     final_score = game_loop()       # Executar la partida
-    show_game_over(final_score)     # Mostrar pantalla de Game Over i esperar reinici
+    show_game_over(score)     # Mostrar pantalla de Game Over i esperar reinici
     pygame.mixer.music.stop()
