@@ -1,3 +1,5 @@
+from lib2to3.pygram import python_grammar_no_print_statement
+
 import pygame
 import random
 import sys
@@ -39,15 +41,28 @@ game_over_background = pygame.transform.scale(game_over_background, (WIDTH, HEIG
 # Cargar sprites-----
 
 # JUGADOR
+
 player_image = pygame.image.load("avion_jugador.png").convert_alpha()
-player_image = pygame.transform.scale(player_image, (100, 100))
+player_image = pygame.transform.scale(player_image, (170, 170))
+player_arriba = pygame.image.load("avion_jugador_up.png").convert_alpha()
+player_arriba = pygame.transform.scale(player_arriba, (170, 170))
+player_abajo = pygame.image.load("avion_jugador_d.png").convert_alpha()
+player_abajo = pygame.transform.scale(player_abajo, (170, 170))
 
 #ENEMIGOS
 enemy_images = [
     pygame.image.load("enemigo1.png").convert_alpha(),
+    pygame.image.load("enemigo1_up.png").convert_alpha(),
+    pygame.image.load("enemigo1_down.png").convert_alpha(),
     pygame.image.load("enemigo2.png").convert_alpha(),
-    pygame.image.load("enemigo3.png").convert_alpha()
+    pygame.image.load("enemigo2_arriba.png").convert_alpha(),
+    pygame.image.load("enemigo2_abajo.png").convert_alpha(),
+    pygame.image.load("enemigo3.png").convert_alpha(),
+    pygame.image.load("enemigo3_arriba.png").convert_alpha(),
+    pygame.image.load("enemigo3_abajo.png").convert_alpha(),
 ]
+
+enemy_images = [pygame.transform.scale(img, (200, 200)) for img in enemy_images]
 
 # EXPLOSIONES
 explosion_images = [
@@ -119,10 +134,11 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = player_image  # Usar la imagen del avión del jugador
-        self.image = pygame.transform.scale(self.image, (100, 100   ))  # Escalar si es necesario
+
+
         self.rect = self.image.get_rect()
         self.rect.center = (100, HEIGHT // 2)
-        self.speed = 5
+        self.speed = 7
         self.motor_sound = motor_jugador_sound  # Asignar el sonido del motor del jugador
         self.motor_sound.play(-1)  # Reproducir el sonido del motor en bucle
 
@@ -175,10 +191,10 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             self.rect.y -= self.speed
-
+            self.image = player_arriba
         if keys[pygame.K_DOWN]:
             self.rect.y += self.speed
-
+            self.image = player_abajo
         if keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
             self.image = player_image
@@ -205,13 +221,13 @@ class Obstacle(pygame.sprite.Sprite):
         # Seleccionar una imagen aleatoria para el enemigo
         self.tipo = random.randint(1, 3)  # Asignar un tipo aleatorio (1, 2 o 3)
         self.image = enemy_images[self.tipo - 1]  # Usar la imagen correspondiente al tipo
-        self.image = pygame.transform.scale(self.image, (100, 100))  # Escalar si es necesario
+          # Escalar si es necesario
         self.rect = self.image.get_rect()
         # Posició inicial: fora de la pantalla per la dreta
         self.rect.x = WIDTH + random.randint(10, 100)
         self.rect.y = random.randint(0, HEIGHT - self.rect.height)
         # La velocitat s'incrementa amb la dificultat
-        self.speed = random.randint(5 + difficulty_level, 9 + difficulty_level)
+        self.speed = random.randint(10 + difficulty_level, 18 + difficulty_level)
         self.direction = 1  # Dirección de movimiento para el enemigo 2 (1: abajo, -1: arriba)
         self.last_shot_time = pygame.time.get_ticks()  # Tiempo del último disparo
 
@@ -221,10 +237,16 @@ class Obstacle(pygame.sprite.Sprite):
 
         if self.tipo == 1:
             self.motor_sound = motor_enemigo1_sound
+
         elif self.tipo == 2:
             self.motor_sound = motor_enemigo2_sound
+            self.image_subiendo = enemy_images[4]  # enemigo2_arriba.png
+            self.image_bajando = enemy_images[5]  # enemigo2_abajo.png
+
         elif self.tipo == 3:
             self.motor_sound = motor_enemigo3_sound
+            self.image_subiendo = enemy_images[7]
+            self.image_bajando = enemy_images[8]
 
         self.motor_sound.play(-1)  # Reproducir el sonido del motor en bucle
 
@@ -259,13 +281,20 @@ class Obstacle(pygame.sprite.Sprite):
             if self.rect.top < 0 or self.rect.bottom > HEIGHT:
                 self.direction *= -1  # Cambiar dirección al llegar a los bordes
 
+            if self.direction == 1:
+                self.image = self.image_bajando
+            else:
+                self.image_subiendo
+
         elif self.tipo == 3:
             # Enemigo 3: apunta hacia el jugador
             delta_y = player.rect.centery - self.rect.centery
             if delta_y > 0:
                 self.rect.y += min(2, delta_y)  # Moverse hacia abajo
+                self.image = self.image_bajando
             elif delta_y < 0:
                 self.rect.y -= min(2, -delta_y)  # Moverse hacia arriba
+                self.image = self.image_subiendo
 
         # Disparar según el tipo de enemigo
         current_time = pygame.time.get_ticks()
@@ -355,7 +384,7 @@ class EnemyProjectile(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (20, 10))  # Escalar si es necesario
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)  # Posición inicial del proyectil
-        self.speed = -7  # Velocidad del proyectil (hacia la izquierda)
+        self.speed = -20  # Velocidad del proyectil (hacia la izquierda)
 
     def update(self):
         """Mueve el proyectil hacia la izquierda."""
@@ -685,9 +714,9 @@ def show_game_over(score):
                 waiting = False
         screen.blit(game_over_background, (0, 0))
 
-        draw_text(screen, "Game Over!", font, RED, 350, 200)
-        draw_text(screen, "Puntuació Final: " + str(score), font, BLACK, 320, 250)
-        draw_text(screen, "Prem qualsevol tecla per reiniciar", font, BLACK, 250, 300)
+        draw_text(screen, "¡Misión fallada!", font, RED, 350, 200)
+        draw_text(screen, "Puntuació Final: " + str(score), font, WHITE, 320, 250)
+        draw_text(screen, "Prem qualsevol tecla per reiniciar", font, WHITE, 250, 300)
         pygame.display.flip()
 
 # ========================
