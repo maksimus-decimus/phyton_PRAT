@@ -568,8 +568,8 @@ def game_loop():
     game_state = "playing"
     running = True
     paused = False  # Variable para controlar el estado de pausa
-    projectiles = pygame.sprite.Group()  # Grupo para los proyectiles del jugador
-    last_enemy_shot_time = pygame.time.get_ticks()  # Tiempo del último disparo enemigo
+    projectiles = pygame.sprite.Group()  # Grupo para los proyectiles
+    last_enemy_shot_time = pygame.time.get_ticks()  # Control de disparo enemigo
 
     while running and game_state == "playing":
         clock.tick(FPS)
